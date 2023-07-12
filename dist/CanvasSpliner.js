@@ -240,7 +240,7 @@ CubicSpline = function () {
     return CubicSpline;
 }();
 
-var index = {
+var splines = {
     CubicSpline: CubicSpline,
     MonotonicCubicSpline: MonotonicCubicSpline
 };
@@ -389,7 +389,7 @@ class PointCollection {
     var newIndex = index;
 
     if(index >= 0 && index < this._points.length){
-      if(p.x >= this._min.x && p.x < this._max.x && p.y >= this._min.y && p.y < this._max.y){
+      if(p.x >= this._min.x && p.x <= this._max.x && p.y >= this._min.y && p.y <= this._max.y){
 
         if(!this._points[index].xLocked)
           this._points[index].x = p.x;
@@ -549,9 +549,9 @@ class CanvasSpliner {
     //this._canvas.addEventListener( 'keydown', this._onKeyDown.bind(this), false );
 
     // dealing with cubic spline type
-    this._splineConstructor = index.CubicSpline;
+    this._splineConstructor = splines.CubicSpline;
     if(splineType === "monotonic"){
-      this._splineConstructor = index.MonotonicCubicSpline;
+      this._splineConstructor = splines.MonotonicCubicSpline;
     }
 
     // the point collection
@@ -678,9 +678,9 @@ class CanvasSpliner {
   */
   setSplineType( splineType ){
     if(splineType === "monotonic"){
-      this._splineConstructor = index.MonotonicCubicSpline;
+      this._splineConstructor = splines.MonotonicCubicSpline;
     }else{
-      this._splineConstructor = index.CubicSpline;
+      this._splineConstructor = splines.CubicSpline;
     }
   }
 
@@ -808,8 +808,8 @@ class CanvasSpliner {
     this._canvas.focus();
 
     if(this._pointHoveredIndex == -1 ){
-      var index$$1 = this.add( {x: this._mouse.x / this._width, y: this._mouse.y / this._height} );
-      this._pointHoveredIndex = index$$1;
+      var index = this.add( {x: this._mouse.x / this._width, y: this._mouse.y / this._height} );
+      this._pointHoveredIndex = index;
     }else{
       this.remove( this._pointHoveredIndex );
       this._pointHoveredIndex = -1;
@@ -879,12 +879,12 @@ class CanvasSpliner {
   * @param {Object} pt - of type {x: Number, y: Number} and optionnally the boolean properties "xLocked" and "yLocked". x and y must be in [0, 1]
   */
   add( pt, draw = true ){
-    var index$$1 = null;
+    var index = null;
 
     if("x" in pt && "y" in pt){
       pt.x *= this._width;
       pt.y *= this._height;
-      index$$1 = this._pointCollection.add( pt );
+      index = this._pointCollection.add( pt );
       //console.log("a point is added");
     }
 
@@ -895,7 +895,7 @@ class CanvasSpliner {
     if(this._onEvents.pointAdded)
       this._onEvents.pointAdded( this );
 
-    return index$$1;
+    return index;
   }
 
 
@@ -903,8 +903,8 @@ class CanvasSpliner {
   * Remove a point using its index
   * @param {Number} index - index of the point to remove (from left to right, starting at 0)
   */
-  remove( index$$1 ){
-    var removedPoint = this._pointCollection.remove( index$$1 );
+  remove( index ){
+    var removedPoint = this._pointCollection.remove( index );
     this.draw();
     
     if(this._onEvents.pointRemoved)

@@ -144,7 +144,7 @@ class PointCollection {
     var newIndex = index;
 
     if(index >= 0 && index < this._points.length){
-      if(p.x >= this._min.x && p.x < this._max.x && p.y >= this._min.y && p.y < this._max.y){
+      if(p.x >= this._min.x && p.x <= this._max.x && p.y >= this._min.y && p.y <= this._max.y){
 
         if(!this._points[index].xLocked)
           this._points[index].x = p.x;
